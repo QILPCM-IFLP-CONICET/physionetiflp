@@ -17,6 +17,8 @@ dependencies = [
     # List your dependencies here, e.g.:
     "numpy>=1.21.0",
     "pandas",
+    "pyedflib",
+    "urllib",
     # "scipy>=1.7.0",
 ]
 
