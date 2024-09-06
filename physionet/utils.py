@@ -4,11 +4,50 @@ Rutinas para importar y  exportar los registros.
 
 import csv
 import os
+from urllib import request
+from urllib.error import HTTPError
 
 import pandas as pd
 import pyedflib as plib
 from pyedflib import highlevel
 from scipy.io import savemat
+
+SRC_URL_FORMAT = (
+    "https://physionet.org/files/eegmmidb/1.0.0"
+    "/{paciente_id}/{paciente_id}{registro_id}.edf"
+)
+
+
+def descargar_paciente_registro(paciente_id, registro_id, path):
+    """
+    Descarga un registro asociado a un paciente
+    paciente_id: str
+        el identificador de paciente (Ej, "S002").
+    registro_id: str
+        el identificador del registro (Ej, "R03").
+    path: str
+        la ruta donde se guardará el registro.
+    """
+    try:
+        url = SRC_URL_FORMAT.format(paciente_id=paciente_id, registro_id=registro_id)
+        print(url)
+        handler = request.build_opener(request.HTTPCookieProcessor).open(
+            url,
+        )
+    except HTTPError as e:
+        print(e)
+        print("paciente o registro no encontrado")
+        return None
+
+    while path[-1] == "/":
+        path = path[:-1]
+
+    path = f"{path}/{paciente_id}/{paciente_id}{registro_id}.edf"
+    with open(path, "wb") as f:
+        f.write(handler.read())
+        handler.close
+
+    return path
 
 
 def dic_elemento_a_ruta_elemento(
